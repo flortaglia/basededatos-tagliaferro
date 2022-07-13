@@ -4,13 +4,19 @@ class Contenedor{
         try{
             this.dbMariadb=dbMariadb
             this.tableName=tableName
-           
-            //dbMariadb.destroy() 
+            dbMariadb.schema.hasTable(tableName).then(function(exists) {
+                if (!exists) {
+                  return dbMariadb.schema.createTable(tableName, table=>{
+                    table.increments('id').primary()
+                    table.string('title',50)
+                    table.float('price')
+                    table.string('thumbnail')
+                  });
+                }})  
+                console.log('tabla creada carritos')
         }catch(err){
-            console.log('error constructor',err)
-            //dbMariadb.destroy() 
+            console.log('error constructor',err)    
         }
-        
     }
    
     async getById(id_prod){
@@ -29,29 +35,29 @@ class Contenedor{
         
     }
     
-    async update(id, title, description, code, price, thumbnail, stock){
+    async update(id, title,  price, thumbnail){
         
         await this.dbMariadb.from(this.tableName).where('id' ,'=',id).update({
             title:title,
             price:price,
             thumbnail:thumbnail,
-            description:description,
-            code:code,
-            stock:stock,
-            timestamp:Date.now()
+            // description:description,
+            // code:code,
+            // stock:stock,
+            // timestamp:Date.now()
 
         })
               
     }
-    async newProduct(title, description, code, price, thumbnail, stock){
+    async newProduct(title, price, thumbnail){
         const elemento = {
             title,
             price,
             thumbnail,
-            description, 
-            code,
-            stock,
-            timestamp:Date.now()
+            // description, 
+            // code,
+            // stock,
+            // timestamp:Date.now()
         }
         const product= await this.dbMariadb.from(this.tableName).insert(elemento)
         return product
